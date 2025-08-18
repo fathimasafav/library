@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
     },profilePi:{
         type:String,
         default:""
+    },bio:{
+        type:String,
+        max_Length:150,
+        default:""
     }
 }, { timestamps: true });
 
