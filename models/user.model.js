@@ -19,6 +19,9 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:[true,'User password is required'],
         min_Length:3,
+    },profilePi:{
+        type:String,
+        default:""
     }
 }, { timestamps: true });
 

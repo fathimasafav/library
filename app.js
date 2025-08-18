@@ -1,6 +1,10 @@
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import {PORT} from './config/env.js'
+import path from "path";
+import cors from "cors"
+
+
 
 
 
@@ -9,14 +13,24 @@ import connectToDatabase from './database/mongodb.js';
 import errorMiddleware from './middlewares/error.middleware.js';
 import userRouter from './routes/user.routes.js';
 import bookRouter from './routes/book.routes.js';
-import arcjetMiddleware from './middlewares/arject.middleware.js';
+// import arcjetMiddleware from './middlewares/arject.middleware.js';
+
+
 
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended:false}));
 app.use(cookieParser())
-app.use(arcjetMiddleware)
+
+app.use(cors({
+    origin: "http://localhost:5173"
+}))
+
+// app.use(arcjetMiddleware);
+// app.use("/uploads", express.static("uploads"))
+app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
+
 
 app.use('/api/v1/auth',authRouter);
 app.use('/api/v1/user',userRouter);

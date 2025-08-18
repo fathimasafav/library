@@ -1,5 +1,52 @@
 // import { json } from "express";
 import User from "../models/user.model.js";
+import jwt from "jsonwebtoken"
+
+// for profile page
+// New function: get currently logged-in user (Profile Page)
+
+export const getMe=async(req,res,next)=>{
+
+    try{
+        const token=req.headers.authorization?.split(" ")[1]
+        if(!token){
+            res.status(401).json({success:false, message:"No token provided"})
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+
+        // Find user without password
+
+        const user=await User.findById(decoded.id).select("-password");
+        if(!user){
+            return res.status(404).json({success:false,message:"user not found"})
+
+        }
+        res.status(200).json({
+            success:true,
+            data:user,
+        });
+   
+    }catch(error){
+        next(error)
+    }
+}
+
+export const updateMe= async(req,res,next)=>{
+    try{
+        const token = req.headers.authorization?.split(" ")[1];
+        if(!token){
+            return res.status(401).json({
+                su
+            })
+        }
+
+    }catch(error){
+        next(error)
+    }
+}
+
+
+
 
 export const getUsers = async(req,res,next)=>{
     try{
