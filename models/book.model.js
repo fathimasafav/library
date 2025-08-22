@@ -19,7 +19,7 @@ const bookSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        enum: ["fantasy", "fiction", "thriller"],
+        enum: ["Fantasy", "Fiction", "Thriller","Science","Non-Fiction","Romance"],
         required: true,
     },
     coverImage: {

@@ -4,156 +4,211 @@ import jwt from "jsonwebtoken"
 
 // for profile page
 // New function: get currently logged-in user (Profile Page)
+console.log(1)
 
-export const getMe=async(req,res,next)=>{
-
-    try{
-        const token=req.headers.authorization?.split(" ")[1]
-        if(!token){
-            res.status(401).json({success:false, message:"No token provided"})
+export const getMe = async (req, res, next) => {
+    console.log(5)
+    try {
+        const token = req.headers.authorization?.split(" ")[1]
+        if (!token) {
+            res.status(401).json({ success: false, message: "No token provided" })
         }
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
         // Find user without password
 
-        const user=await User.findById(decoded.id).select("-password");
-        if(!user){
-            return res.status(404).json({success:false,message:"user not found"})
+        const user = await User.findById(decoded.userId).select("-password");
+        if (!user) {
+            return res.status(404).json({ success: false, message: "user not found" })
 
         }
         res.status(200).json({
-            success:true,
-            data:user,
+            success: true,
+            data: user,
         });
-   
-    }catch(error){
+        console.log(user)
+
+    } catch (error) {
         next(error)
     }
 }
 
-export const updateMe= async(req,res,next)=>{
-    try{
+export const updateMe = async (req, res, next) => {
+   
+    try {
         const token = req.headers.authorization?.split(" ")[1];
-        if(!token){
+        if (!token) {
             return res.status(401).json({
-                su
+                success: false,
+                message: "no token provided"
             })
         }
 
-    }catch(error){
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const updates = req.body
+
+        // if image uploaded, add it to updates
+        if (req.file) {
+            updates.profilePic=req.file.path
+        }
+
+        const updateUser = await User.findByIdAndUpdate(
+            decoded.userId,
+            updates,
+            { new: true, runValidators: true }
+        ).select("-password")
+
+        if (!updateUser) {
+            return res.status(404).json({ success: false, message: "user not found" })
+        }
+        res.status(200).json({
+            success: true,
+            message: "updated profile successfully",
+            data: updateUser
+        });
+    } catch (error) {
         next(error)
     }
+   
 }
 
 
 
 
-export const getUsers = async(req,res,next)=>{
-    try{
+export const getUsers = async (req, res, next) => {
+    try {
         const users = await User.find();
 
         res.status(200).json({
-            success:true,
+            success: true,
             data: users
         })
 
-    }catch (error){
+    } catch (error) {
         next(error)
     }
 }
 
-export const getUser = async (req,res,next)=>{
-    try{
-        const user = await User.findById(req.params.id);
+// export const getUser = async (req, res, next) => {
+//     try {
+//         const user = await User.findById(req.params.id);
 
-        if(!user){
-            const error = new Error("user not found");
-            error.statusCode=404;
-            throw error;
+//         if (!user) {
+//             const error = new Error("user not found");
+//             error.statusCode = 404;
+//             throw error;
+//         }
+
+//         res.status(200).json({
+//             success: true,
+//             data: user
+//         })
+
+//     } catch (error) {
+//         next(error)
+//     }
+// }
+
+export const getUser = async (req, res, next) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+
+        if (!token) {
+            res.status(401).json({ success: false, message: "no token provided" })
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        if(!decoded.id !== req.params.id){
+            return res.status(403).json({success:false, message:"you are not authorized to view this"})
         }
 
+        const user = await User.findById(req.params.id).select("-password")
+        if(!user){
+            return res.status(404).json({success:false,message:"user not found"})
+        }
         res.status(200).json({
             success:true,
             data:user
         })
 
-    }catch(error){
+    } catch (error) {
         next(error)
     }
 }
- 
-export const createUser = async(req,res,next)=>{
-   try{
-    const {email} = req.body
-       const existingUser = await User.findOne({email})
-       if(existingUser){
-           const error = new Error("user is already exist");
-           error.statusCode = 404;
-           throw error;
-       }
-       const createNewUser = await User.create(req.body)
-    res.status(200).json({
-        success:true,
-        data:createNewUser
-        
-    })
 
-   }catch(error){
-    next(error)
-   }
+
+export const createUser = async (req, res, next) => {
+    try {
+        const { email } = req.body
+        const existingUser = await User.findOne({ email })
+        if (existingUser) {
+            const error = new Error("user is already exist");
+            error.statusCode = 404;
+            throw error;
+        }
+        const createNewUser = await User.create(req.body)
+        res.status(201).json({
+            success: true,
+            data: createNewUser
+
+        })
+
+    } catch (error) {
+        next(error)
+    }
 }
 
-export const UserUpdateById = async(req,res,next)=>{
+export const UserUpdateById = async (req, res, next) => {
 
-    try{
+    try {
         const UserId = req.params.id;
-        const updates =req.body;
+        const updates = req.body;
 
         const updateUser = await User.findByIdAndUpdate(
             UserId,
             updates,
             { new: true, runValidators: true }
         )
-        if(!updateUser){
+        if (!updateUser) {
             return res.status(404).json({
-                success:false,
-                message:"user is not updated"
+                success: false,
+                message: "user is not updated"
             })
         }
 
         updateUser.save()
 
         res.status(200).json({
-            success:true,
-            data:updateUser
+            success: true,
+            data: updateUser
         })
 
-    }catch(error){
+    } catch (error) {
         next(error)
     }
 }
 
-export const UserDeleteById = async (req,res,next)=>{
+export const UserDeleteById = async (req, res, next) => {
 
-    try{
+    try {
 
         const UserId = req.params.id
         const deleteUser = await User.findByIdAndDelete(UserId);
 
-        if(!deleteUser){
+        if (!deleteUser) {
             return res.status(404).json({
-                success:false,
-                message:"product not found"
+                success: false,
+                message: "product not found"
             })
         }
-    
-    res.status(200).json({
-        success:true,
-        data:deleteUser,
-    })
-    console.log(deleteUser)
 
-    }catch(error){
+        res.status(200).json({
+            success: true,
+            data: deleteUser,
+        })
+        console.log(deleteUser)
+
+    } catch (error) {
         next(error)
     }
 }
