@@ -4,8 +4,8 @@ const bookSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
-        min_Length: 2,
-        max_Length: 50,
+        minlength: 2,
+        maxlength: 50,
     },
     author: {
         type: String,
@@ -14,8 +14,8 @@ const bookSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: [true, "product number is required"],
-        min_Length: [0, 'price must be greater than 0'],
-        max_Length: [1000, 'price must be less than 1000'],
+        min: [0, 'price must be greater than 0'],
+        max: [1000, 'price must be less than 1000'],
     },
     category: {
         type: String,

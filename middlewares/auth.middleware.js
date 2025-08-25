@@ -37,4 +37,4 @@ const authorize = async(req,res,next)=>{
 
 }
 
-export default authorize    ;
+export default authorize;

@@ -13,6 +13,7 @@ import connectToDatabase from './database/mongodb.js';
 import errorMiddleware from './middlewares/error.middleware.js';
 import userRouter from './routes/user.routes.js';
 import bookRouter from './routes/book.routes.js';
+import CartRouter from './routes/Cart.routes.js';
 // import arcjetMiddleware from './middlewares/arject.middleware.js';
 
 
@@ -24,7 +25,10 @@ app.use(express.urlencoded({ extended:false}));
 app.use(cookieParser())
 
 app.use(cors({
-    origin: "http://localhost:5173"
+    origin: "http://localhost:5173",
+    credentials: true,
+    methods: ["GET","HEAD","PUT","PATCH","POST","DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }))
 
 // app.use(arcjetMiddleware);
@@ -35,6 +39,7 @@ app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
 app.use('/api/v1/auth',authRouter);
 app.use('/api/v1/user',userRouter);
 app.use('/api/v1/book',bookRouter);
+app.use('/api/v1/cart',CartRouter)
 
 app.use(errorMiddleware)
 

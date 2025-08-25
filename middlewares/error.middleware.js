@@ -13,7 +13,7 @@ const errorMiddleware = (err,req,res,next)=>{
         }
 
         // Mongoose duplicte key
-        if(err.code === 11000) {
+        if(err.code === 400) {
             const message = "Duplicate feild value entred";
             error =new Error(message);
             error.statusCode =400;

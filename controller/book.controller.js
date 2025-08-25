@@ -114,7 +114,7 @@ export const bookDeleteById = async (req, res, next) => {
         const deletebook = await book.findByIdAndDelete(req.params.id);
         if (!deletebook) {
             return res.status(404).json({
-                success: true,
+                success: false,
                 message: "book is not deleted"
             })
         }
