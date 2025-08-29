@@ -1,9 +1,32 @@
 // import { data } from "react-router-dom";
+// import { title } from "process";
+// import { categories } from "@arcjet/node";
 import book from "../models/book.model.js";
 
 export const getBooks = async (req, res, next) => {
     try {
-        const Books = await book.find();
+        const { q,category } = req.query;
+        let filter = {};
+        if (q) {
+            filter = {
+                $or: [
+                    { title: { $regex: q, $options: "i" } },
+                    { author: { $regex: q, $options: "i" } },
+                    { category: { $regex: q, $options: "i" } }
+                ]
+            }
+        }
+
+        if (category && category !== "All"){
+            filter.category=category
+        }
+        let query = book.find(filter);
+
+        // // sorting
+        // if (sort === "asc") query = query.sort({ price: 1 });
+        // if (sort === "desc") query = query.sort({ price: -1 });
+
+        const Books = await query;
 
         res.status(200).json({
             success: true,
